@@ -30,15 +30,15 @@ def on_message(client, userdata, msg):
     topic = msg.topic
     payload = msg.payload
     if payload != "":
-        sys.stdout.write("Source: " + topic + " - ")
-        sys.stdout.write("Placing Vote for " + payload + " - ")
+        sys.stderr.write("Source: " + topic + " - ")
+        sys.stderr.write("Placing Vote for " + payload + " - ")
         result = record_vote(payload)
         if result == "1" :
-            sys.stdout.write(" Successful - ")
+            sys.stderr.write(" Successful - ")
             # Clear This Topic
             clear_vote_topic(topic)
-            sys.stdout.write("Cleared\n")
-        else: sys.stdout.write(" UnSuccessful\n")
+            sys.stderr.write("Cleared\n")
+        else: sys.stderr.write(" UnSuccessful\n")
 
 # Post Vote to Data API
 def record_vote(hero):
