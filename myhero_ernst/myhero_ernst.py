@@ -12,6 +12,7 @@
 __author__ = 'hapresto'
 
 import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
 import sys, os, socket, dns.resolver
 import requests
 
@@ -21,17 +22,23 @@ def on_connect(client, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("MyHero-Votes")
+    client.subscribe("MyHero-Votes/#")
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     # print(msg.topic+" "+str(msg.payload))
     topic = msg.topic
     payload = msg.payload
-    sys.stdout.write("Placing Vote for " + payload + " - ")
-    result = record_vote(payload)
-    if result == "1" : sys.stdout.write("Vote Successful\n")
-    else: sys.stdout.write("Vote UnSuccessful\n")
+    if payload != "":
+        sys.stdout.write("Source: " + topic + " - ")
+        sys.stdout.write("Placing Vote for " + payload + " - ")
+        result = record_vote(payload)
+        if result == "1" :
+            sys.stdout.write(" Successful - ")
+            # Clear This Topic
+            clear_vote_topic(topic)
+            sys.stdout.write("Cleared\n")
+        else: sys.stdout.write(" UnSuccessful\n")
 
 # Post Vote to Data API
 def record_vote(hero):
@@ -40,6 +47,12 @@ def record_vote(hero):
     page = requests.post(u, headers = data_requests_headers)
     result = page.json()["result"]
     return result
+
+def clear_vote_topic(topic):
+    # Basic Publish to a MQTT Queue
+    print("Clearing " + topic)
+    publish.single(topic, payload=None, hostname=mqtt_host, port=mqtt_port, retain=True)
+    return ""
 
 
 # Get SRV Lookup Details for Queueing Server
