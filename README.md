@@ -14,11 +14,24 @@ Other services are:
 * Data - [hpreston/myhero_data](https://github.com/hpreston/myhero_data)
 * App - [hpreston/myhero_app](https://github.com/hpreston/myhero_app)
 * Web - [hpreston/myhero_web](https://github.com/hpreston/myhero_web)
+* Ernst - [hpreston/myhero_ernst](https://github.com/hpreston/myhero_ernst)
+  * Optional Service used along with an MQTT server when App is in "queue" mode
+* Spark Bot - [hpreston/myhero_spark](https://github.com/hpreston/myhero_spark)
+  * Optional Service that allows voting through IM/Chat with a Cisco Spark Bot
+* Tropo App - [hpreston/myhero_tropo](https://github.com/hpreston/myhero_tropo)
+  * Optional Service that allows voting through TXT/SMS messaging
+
 
 The docker containers are available at
 * Data - [hpreston/myhero_data](https://hub.docker.com/r/hpreston/myhero_data)
 * App - [hpreston/myhero_app](https://hub.docker.com/r/hpreston/myhero_app)
 * Web - [hpreston/myhero_web](https://hub.docker.com/r/hpreston/myhero_web)
+* Ernst - [hpreston/myhero_ernst](https://hub.docker.com/r/hpreston/myhero_ernst)
+  * Optional Service used along with an MQTT server when App is in "queue" mode
+* Spark Bot - [hpreston/myhero_spark](https://hub.docker.com/r/hpreston/myhero_spark)
+  * Optional Service that allows voting through IM/Chat with a Cisco Spark Bot
+* Tropo App - [hpreston/myhero_tropo](https://hub.docker.com/r/hpreston/myhero_tropo)
+  * Optional Service that allows voting through TXT/SMS messaging
 
 ## Environmental Requirement
 This service requires an MQTT server or broker to be available that can be subscribed, where votes will be published by the APP service.  The larger [MyHero Demo](https://github.com/hpreston/myhero_demo) application leverages [Mosca](https://hub.docker.com/r/matteocollina/mosca/) as a MQTT server for this purpose, though any MQTT server or broker should work.
