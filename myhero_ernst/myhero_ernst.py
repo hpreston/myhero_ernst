@@ -109,18 +109,6 @@ if __name__=='__main__':
 
     args = parser.parse_args()
 
-    # data_server = args.dataserver
-    # # print "Arg Data: " + str(data_server)
-    # if (data_server == None):
-    #     data_server = os.getenv("myhero_data_server")
-    #     # print "Env Data: " + str(data_server)
-    #     if (data_server == None):
-    #         get_data_server = raw_input("What is the data server address? ")
-    #         # print "Input Data: " + str(get_data_server)
-    #         data_server = get_data_server
-    # # print "Data Server: " + data_server
-    # sys.stderr.write("Data Server: " + data_server + "\n")
-
     # Priority for Data Server
     # 1. Explicit Data Server Address
     #    1. Arguments
