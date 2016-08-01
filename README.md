@@ -84,6 +84,27 @@ A command line argument overrides an environment variable, and raw input is only
 
 **For determining the MQTT Server IP and Port, explicitly setting them through Command Line Arguements or through ENV variables will be preferred over a DNS lookup**
 
+# Alternate and Advanced Configurations
+
+## Finding Data Server Details with SRV Lookup
+
+If in your deployment, the myhero_data microservice is deployed in a way that the data server address (ie IP and Port) are dynamic, there is support for querying an SRV record to determine the details.
+
+An example of this type of setup would be deploying MyHero to a Mantl.io cluster where Consul.io is used for service discovery.  Rather than hard code in the address of the data server, you would query Consul for the address infromation.
+
+To use this method, you will provide a different argument or environment variable to the program.
+
+* As a command line argument
+  - `python myhero_ernst/myhero_ernst.py --datasrv "data-myhero.service.consul" --datakey "DATA AUTH KEY" --appsecret "APP AUTH KEY" --mqtthost "192.168.1.10" --mqttport "1883" --mqttserver "mqtt.service.consul" `
+* As environment variables
+  - `export myhero_data_srv"data-myhero.service.consul"`
+  - `export myhero_data_key="DATA AUTH KEY"`
+  - `export myhero_mqtt_host=192.168.1.10`
+  - `export myhero_mqtt_port=1883`
+  - `export myhero_mqtt_server=mqtt.service.consul`
+  - `python myhero_ernst/myhero_ernst.py`
+
+
 # Accessing
 
 Initial and Basic APIs.
