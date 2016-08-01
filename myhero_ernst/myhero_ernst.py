@@ -16,13 +16,24 @@ import paho.mqtt.publish as publish
 import sys, os, socket, dns.resolver
 import requests
 
+data_server = None
+data_srv = None
+mqtt_server = None
+mqtt_host = None
+mqtt_port = None
+
+
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     sys.stderr.write("Connected with result code "+str(rc) + "\n")
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("MyHero-Votes/#")
+    try:
+        client.subscribe("MyHero-Votes/#")
+    except:
+        set_mqtt_server(mqtt_server)
+        client.subscribe("MyHero-Votes/#")
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -42,16 +53,27 @@ def on_message(client, userdata, msg):
 
 # Post Vote to Data API
 def record_vote(hero):
-    u = data_server + "/vote/" + hero
-    data_requests_headers = {"key": data_key}
-    page = requests.post(u, headers = data_requests_headers)
+    try:
+        u = data_server + "/vote/" + hero
+        data_requests_headers = {"key": data_key}
+        page = requests.post(u, headers = data_requests_headers)
+    except:
+        set_data_server(data_srv)
+        u = data_server + "/vote/" + hero
+        data_requests_headers = {"key": data_key}
+        page = requests.post(u, headers=data_requests_headers)
+
     result = page.json()["result"]
     return result
 
 def clear_vote_topic(topic):
     # Basic Publish to a MQTT Queue
     print("Clearing " + topic)
-    publish.single(topic, payload=None, hostname=mqtt_host, port=mqtt_port, retain=True)
+    try:
+        publish.single(topic, payload=None, hostname=mqtt_host, port=mqtt_port, retain=True)
+    except:
+        set_mqtt_server(mqtt_server)
+        publish.single(topic, payload=None, hostname=mqtt_host, port=mqtt_port, retain=True)
     return ""
 
 
@@ -82,6 +104,42 @@ def ip_lookup(name):
     except:
         raise ValueError("Can't find A Record")
     return results
+
+def set_data_server(data_srv):
+    sys.stderr.write("Looking up Data Service Address: %s.\n" % (data_srv))
+
+    global data_server
+    # Lookup and resolve the IP and Port for the Data Server by SRV Record
+    try:
+        records = srv_lookup(data_srv)
+        # To find the HOST IP address need to take the returned hostname from the
+        # SRV check and do an IP lookup on it
+        data_srv_host = str(ip_lookup(records[0][0]))
+        data_srv_port = records[0][1]
+    except ValueError:
+        raise ValueError("Data SRV Record Not Found")
+        sys.exit(1)
+    # Create data_server format
+    data_server = "http://%s:%s" % (data_srv_host, data_srv_port)
+    sys.stderr.write("Data Server: " + data_server + "\n")
+
+def set_mqtt_server(mqtt_server):
+    sys.stderr.write("Looking up MQTT Service Address: %s.\n" % (mqtt_server))
+
+    global mqtt_host
+    global mqtt_port
+    # Lookup and resolve the IP and Port for the MQTT Server
+    try:
+        records = srv_lookup(mqtt_server)
+        if len(records) != 1: raise Exception("More than 1 SRV Record Returned")
+        # To find the HOST IP address need to take the returned hostname from the
+        # SRV check and do an IP lookup on it
+        mqtt_host = str(ip_lookup(records[0][0]))
+        mqtt_port = records[0][1]
+    except ValueError:
+        raise ValueError("Message Queue Not Found")
+        sys.exit(1)
+    sys.stderr.write("MQTT Host: %s \nMQTT Port: %s\n" % (mqtt_host, mqtt_port))
 
 
 if __name__=='__main__':
@@ -126,17 +184,8 @@ if __name__=='__main__':
         if (data_srv == None):
             data_srv = os.getenv("myhero_data_srv")
         if (data_srv != None):
-            # Lookup and resolve the IP and Port for the Data Server by SRV Record
-            try:
-                records = srv_lookup(data_srv)
-                # To find the HOST IP address need to take the returned hostname from the
-                # SRV check and do an IP lookup on it
-                data_srv_host = str(ip_lookup(records[0][0]))
-                data_srv_port = records[0][1]
-            except ValueError:
-                raise ValueError("Data SRV Record Not Found")
-            # Create data_server format
-            data_server = "http://%s:%s" % (data_srv_host, data_srv_port)
+            # Turn into function here..
+            set_data_server(data_srv)
     # 3. Prompt
     #    1. Address
     if (data_server == None):
@@ -178,6 +227,10 @@ if __name__=='__main__':
                 if (mqtt_server == None):
                     mqtt_server = raw_input("What is the MQTT Server FQDN for an SRV Lookup? ")
             sys.stderr.write("MQTT Server: " + mqtt_server + "\n")
+
+            # Function to set the MQTT Server
+            set_mqtt_server(mqtt_server)
+
             # Lookup and resolve the IP and Port for the MQTT Server
             try:
                 records = srv_lookup(mqtt_server)
