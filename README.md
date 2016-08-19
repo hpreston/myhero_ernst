@@ -1,19 +1,20 @@
-**IN DEVELOPMENT NOT READY FOR WIDE SPREAD USE YET**
-
 # MyHero Ernst Service
 
 This is the Vote Processing Service for a basic microservice demo application.
 This service subscribes to an MQTT Server where votes are waiting for processing.
 
 Details on deploying the entire demo to a Mantl cluster can be found at
+
 * MyHero Demo - [hpreston/myhero_demo](https://github.com/hpreston/myhero_demo)
 
 The application was designed to provide a simple demo for Cisco Mantl.  It is written as a simple Python Flask application and deployed as a docker container.
 
 Other services are:
+
 * Data - [hpreston/myhero_data](https://github.com/hpreston/myhero_data)
 * App - [hpreston/myhero_app](https://github.com/hpreston/myhero_app)
 * Web - [hpreston/myhero_web](https://github.com/hpreston/myhero_web)
+* UI - [hpreston/myhero_ui](https://github.com/hpreston/myhero_ui)
 * Ernst - [hpreston/myhero_ernst](https://github.com/hpreston/myhero_ernst)
   * Optional Service used along with an MQTT server when App is in "queue" mode
 * Spark Bot - [hpreston/myhero_spark](https://github.com/hpreston/myhero_spark)
@@ -23,9 +24,11 @@ Other services are:
 
 
 The docker containers are available at
+
 * Data - [hpreston/myhero_data](https://hub.docker.com/r/hpreston/myhero_data)
 * App - [hpreston/myhero_app](https://hub.docker.com/r/hpreston/myhero_app)
 * Web - [hpreston/myhero_web](https://hub.docker.com/r/hpreston/myhero_web)
+* UI - [hpreston/myhero_ui](https://hub.docker.com/r/hpreston/myhero_ui)
 * Ernst - [hpreston/myhero_ernst](https://hub.docker.com/r/hpreston/myhero_ernst)
   * Optional Service used along with an MQTT server when App is in "queue" mode
 * Spark Bot - [hpreston/myhero_spark](https://hub.docker.com/r/hpreston/myhero_spark)
@@ -34,6 +37,7 @@ The docker containers are available at
   * Optional Service that allows voting through TXT/SMS messaging
 
 ## Environmental Requirement
+
 This service requires an MQTT server or broker to be available that can be subscribed, where votes will be published by the APP service.  The larger [MyHero Demo](https://github.com/hpreston/myhero_demo) application leverages [Mosca](https://hub.docker.com/r/matteocollina/mosca/) as a MQTT server for this purpose, though any MQTT server or broker should work.
 
 The Vagrant environment for local development of this service deploys a Mosca container along with the ernst service itself and leverages it for local development work.
@@ -57,6 +61,7 @@ Required
 # Basic Usage
 
 In order to run, the service needs 3 pieces of information to be provided:
+
 * Data Server Address
 * Data Server Authentication Key to Use
 * MQTT Server IP and Port
@@ -65,6 +70,7 @@ In order to run, the service needs 3 pieces of information to be provided:
     * Dynamically learned by doing an DNS Lookup
 
 These details can be provided in one of three ways.
+
 * As a command line argument
   - `python myhero_ernst/myhero_ernst.py --dataserver "http://myhero-data.server.com" --datakey "DATA AUTH KEY" --appsecret "APP AUTH KEY" --mqtthost "192.168.1.10" --mqttport "1883" --mqttserver "mqtt.service.consul" `
 * As environment variables
@@ -109,6 +115,7 @@ To use this method, you will provide a different argument or environment variabl
 
 Initial and Basic APIs.
 These are v1 APIs that require no authentication and will eventually be removed
+
 * Basic List of Hero Choices
   * `curl http://localhost:5000/hero_list`
 * Current results calculations
@@ -118,6 +125,7 @@ These are v1 APIs that require no authentication and will eventually be removed
 
 New v2 APIs
 These newer APIs require authentication as well as support more features
+
 * Get the current list of options for voting
   * `curl -X GET -H "key: APP AUTH KEY" http://localhost:5000/options`
 * Add a new option to the list
@@ -137,6 +145,7 @@ These newer APIs require authentication as well as support more features
 I've included the configuration files needed to do local development with Vagrant in the repo.  Vagrant will still use Docker for local development and is configured to spin up a CentOS7 host VM for running the container.
 
 To start local development run:
+
 * `vagrant up`
   - You may need to run this twice.  The first time to start the docker host, and the second to start the container.
 * Now you can interact with the API or interface at localhost:15001 (configured in Vagrantfile and Vagrantfile.host)
