@@ -20,7 +20,6 @@ publish:
     when:
       branch: "master"
 
-
 deploy:
   webhook:
     image: plugins/drone-webhook
@@ -33,6 +32,18 @@ deploy:
       - https://$$MANTL_CONTROL/marathon/v2/apps/$$BRANCH/$$MANTL_APP_NAME/restart?force=true
     when:
       branch: "!master"
+
+  webhook:
+    image: plugins/drone-webhook
+    skip_verify: true
+    method: POST
+    auth:
+      username: $$MANTL_USERNAME
+      password: $$MANTL_PASSWORD
+    urls:
+      - https://$$MANTL_CONTROL/marathon/v2/apps/$$MANTL_APP_NAME_DEV/restart?force=true
+    when:
+      branch: "dev"
 
 notify:
   spark:
